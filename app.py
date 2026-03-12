@@ -81,6 +81,32 @@ EMOJIS = {
     "quince": "🍐", "strawberry": "🍓"
 }
 
+PRICE_FILE = BASE_DIR / "price.json"
+
+CLASS_PRICE_MAP = {
+    "apple": "red_apple",
+    "banana": "banana",
+    "broccoli": "broccoli",
+    "carrot": "carrot",
+    "cucumber": "cucumber",
+    "date_plum": "date_plum",
+    "garlic": "white_garlic",
+    "grape": "grape",
+    "kiwi": "kiwi",
+    "lemon": "yellow_lemons",
+    "mandarin": "mandarin",
+    "onion": "basic_onion",
+    "orange": "orange_lemons",
+    "pear": "green_pear",
+    "persimmon": "persimmon",
+    "pineapple": "pineapple",
+    "pitahaya": "pitahaya",
+    "pomegranate": "pomegranate",
+    "potato": "potato",
+    "quince": "quince",
+    "strawberry": None,   # если цены нет
+}
+
 if "history" not in st.session_state:
     st.session_state.history = []
 
@@ -136,6 +162,22 @@ def load_model_scores(scores_file: Path):
     with open(scores_file, "r", encoding="utf-8") as f:
         return json.load(f)
 
+@st.cache_data
+def load_price_db(price_file: Path):
+    if not price_file.exists():
+        return {}
+
+    with open(price_file, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def get_price_for_class(class_name: str, price_db: dict):
+    mapped_name = CLASS_PRICE_MAP.get(class_name)
+
+    if mapped_name is None:
+        return None
+
+    return price_db.get(mapped_name)
 
 
 def get_model_weight(model_name: str, model_scores: dict) -> float:
@@ -215,12 +257,12 @@ def predict_single_model(model, image: Image.Image, classes, top_k=5):
     k = min(top_k, len(classes))
     top_probs, top_indices = torch.topk(probs, k=k)
 
-    results = []
-    for prob, idx in zip(top_probs, top_indices):
-        results.append({
-            "class": classes[idx.item()],
-            "confidence": float(prob.item() * 100)
-        })
+    class_name = classes[idx.item()]
+    results.append({
+        "class": class_name,
+        "confidence": float(prob.item() * 100),
+        "price_kzt": get_price_for_class(class_name, price_db)
+})
 
     return probs.cpu(), results
 
@@ -250,12 +292,12 @@ def ensemble_predict(selected_model_names, loaded_models, image, classes, model_
     k = min(top_k, len(classes))
     top_probs, top_indices = torch.topk(weighted_probs, k=k)
 
-    results = []
-    for prob, idx in zip(top_probs, top_indices):
-        results.append({
-            "class": classes[idx.item()],
-            "confidence": float(prob.item() * 100)
-        })
+    class_name = classes[idx.item()]
+    results.append({
+        "class": class_name,
+        "confidence": float(prob.item() * 100),
+        "price_kzt": get_price_for_class(class_name, price_db)
+})
 
     return results
 
@@ -271,6 +313,7 @@ except Exception as e:
     st.stop()
 
 model_scores = load_model_scores(MODEL_COMPARISON_FILE)
+price_db = load_price_db(PRICE_FILE)
 
 available_model_names = [
     model_name for model_name, model_path in SUPPORTED_MODELS.items()
@@ -430,14 +473,21 @@ with col2:
                 top = results[0]
                 top_class = top["class"]
                 top_emoji = EMOJIS.get(top_class, "🌿")
+                top_price = top.get("price_kzt")
+                price_text = f"{top_price} ₸" if top_price is not None else "Цена не указана"
 
                 st.success(status_text)
                 st.markdown(
                     f'''<div style="background:linear-gradient(135deg,#162d1a,#1e3a22);border:1px solid #3a6040;border-radius:16px;padding:1.8rem;margin-top:1rem">
                     <div style="font-size:3rem">{top_emoji}</div>
                     <div style="font-family:Playfair Display,serif;font-size:2rem;color:#a8f0a8;font-weight:700">{top_class.replace('_',' ').title()}</div>
+
                     <div style="color:#8aaa8a;font-size:0.8rem;margin-top:1rem;text-transform:uppercase">Уверенность</div>
                     <div style="font-size:1.8rem;color:#7dde7d;font-weight:700">{top['confidence']:.2f}%</div>
+
+                    <div style="color:#8aaa8a;font-size:0.8rem;margin-top:1rem;text-transform:uppercase">Цена</div>
+                    <div style="font-size:1.5rem;color:#ffd580;font-weight:700">{price_text}</div>
+
                     <div style="font-size:0.75rem;color:#4a7a4a;margin-top:0.5rem">⚡ {elapsed*1000:.0f} ms</div>
                     </div>''',
                     unsafe_allow_html=True
@@ -446,7 +496,11 @@ with col2:
                 st.markdown("**Top predictions:**")
                 for item in results:
                     pct = max(0.0, min(item["confidence"] / 100.0, 1.0))
-                    st.markdown(f"{EMOJIS.get(item['class'], '🌿')} **{item['class'].replace('_',' ').title()}** — {item['confidence']:.2f}%")
+                    item_price = item.get("price_kzt")
+                    price_label = f" · {item_price} ₸" if item_price is not None else " · цена не указана"
+                    st.markdown(
+                        f"{EMOJIS.get(item['class'], '🌿')} **{item['class'].replace('_',' ').title()}** — {item['confidence']:.2f}%{price_label}"
+                    )
                     st.progress(pct)
 
                 if prediction_mode == "Несколько моделей (ensemble)":
