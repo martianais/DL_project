@@ -95,8 +95,8 @@ CLASS_PRICE_MAP = {
     "garlic": "white_garlic",
     "grape": "grape",
     "kiwi": "kiwi",
-    "yellow_lemon": "yellow_lemon",
-    "orange_lemon": "orange_lemon",
+    "yellow_lemons": "yellow_lemons",
+    "orange_lemons": "orange_lemons",
     "mandarin": "mandarin",
     "basic_onion": "basic_onion",
     "red_onion": "red_onion",
@@ -117,6 +117,7 @@ CLASS_PRICE_MAP = {
     "red_garlic": "red_garlic",
     "white_garlic": "white_garlic",
     "quince": "quince",
+    "red_pear": red_pear,
 }
 
 if "history" not in st.session_state:
