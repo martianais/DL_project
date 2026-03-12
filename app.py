@@ -84,7 +84,9 @@ EMOJIS = {
 PRICE_FILE = BASE_DIR / "price.json"
 
 CLASS_PRICE_MAP = {
-    "apple": "red_apple",
+    "red_apple": "red_apple",
+    "green_apple": "green_apple",
+    "yellow_apple": "yellow_apple",
     "banana": "banana",
     "broccoli": "broccoli",
     "carrot": "carrot",
@@ -93,18 +95,28 @@ CLASS_PRICE_MAP = {
     "garlic": "white_garlic",
     "grape": "grape",
     "kiwi": "kiwi",
-    "lemon": "yellow_lemons",
+    "yellow_lemon": "yellow_lemon",
+    "orange_lemon": "orange_lemon",
     "mandarin": "mandarin",
-    "onion": "basic_onion",
-    "orange": "orange_lemons",
-    "pear": "green_pear",
+    "basic_onion": "basic_onion",
+    "red_onion": "red_onion",
+    "white_onion": "white_onion",
+    "green_pear": "green_pear",
+    "white_pear": "white_pear",
     "persimmon": "persimmon",
     "pineapple": "pineapple",
     "pitahaya": "pitahaya",
     "pomegranate": "pomegranate",
     "potato": "potato",
+    "tomato": "tomato",
+    "avocado": "avocado",
+    "coconut": "coconut",
+    "lime": "lime",
+    "orange_grapefruit": "orange_grapefruit",
+    "yellow_grapefruit": "yellow_grapefruit",
+    "red_garlic": "red_garlic",
+    "white_garlic": "white_garlic",
     "quince": "quince",
-    "strawberry": None,   # если цены нет
 }
 
 if "history" not in st.session_state:
