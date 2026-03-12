@@ -494,19 +494,23 @@ with col2:
 
                 st.success(status_text)
                 st.markdown(
-                    f'''<div style="background:linear-gradient(135deg,#162d1a,#1e3a22);border:1px solid #3a6040;border-radius:16px;padding:1.8rem;margin-top:1rem">
+                f"""
+                <div style="background:linear-gradient(135deg,#162d1a,#1e3a22);border:1px solid #3a6040;border-radius:16px;padding:1.8rem;margin-top:1rem">
                     <div style="font-size:3rem">{top_emoji}</div>
-                    <div style="font-family:Playfair Display,serif;font-size:2rem;color:#a8f0a8;font-weight:700">{top_class.replace('_',' ').title()}</div>
-
+                    <div style="font-family:'Playfair Display',serif;font-size:2rem;color:#a8f0a8;font-weight:700">
+                        {top_class.replace('_',' ').title()}
+                    </div>
+            
                     <div style="color:#8aaa8a;font-size:0.8rem;margin-top:1rem;text-transform:uppercase">Уверенность</div>
                     <div style="font-size:1.8rem;color:#7dde7d;font-weight:700">{top['confidence']:.2f}%</div>
-
+            
                     <div style="color:#8aaa8a;font-size:0.8rem;margin-top:1rem;text-transform:uppercase">Цена</div>
                     <div style="font-size:1.5rem;color:#ffd580;font-weight:700">{price_text}</div>
-
+            
                     <div style="font-size:0.75rem;color:#4a7a4a;margin-top:0.5rem">⚡ {elapsed*1000:.0f} ms</div>
-                    </div>''',
-                    unsafe_allow_html=True
+                </div>
+                """,
+                unsafe_allow_html=True
                 )
 
                 st.markdown("**Top predictions:**")
