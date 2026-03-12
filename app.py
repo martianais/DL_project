@@ -257,12 +257,14 @@ def predict_single_model(model, image: Image.Image, classes, top_k=5):
     k = min(top_k, len(classes))
     top_probs, top_indices = torch.topk(probs, k=k)
 
-    class_name = classes[idx.item()]
-    results.append({
-        "class": class_name,
-        "confidence": float(prob.item() * 100),
-        "price_kzt": get_price_for_class(class_name, price_db)
-})
+    results = []
+    for prob, idx in zip(top_probs, top_indices):
+        class_name = classes[idx.item()]
+        results.append({
+            "class": class_name,
+            "confidence": float(prob.item() * 100),
+            "price_kzt": get_price_for_class(class_name, price_db)
+        })
 
     return probs.cpu(), results
 
@@ -292,12 +294,14 @@ def ensemble_predict(selected_model_names, loaded_models, image, classes, model_
     k = min(top_k, len(classes))
     top_probs, top_indices = torch.topk(weighted_probs, k=k)
 
-    class_name = classes[idx.item()]
-    results.append({
-        "class": class_name,
-        "confidence": float(prob.item() * 100),
-        "price_kzt": get_price_for_class(class_name, price_db)
-})
+    results = []
+    for prob, idx in zip(top_probs, top_indices):
+        class_name = classes[idx.item()]
+        results.append({
+            "class": class_name,
+            "confidence": float(prob.item() * 100),
+            "price_kzt": get_price_for_class(class_name, price_db)
+        })
 
     return results
 
